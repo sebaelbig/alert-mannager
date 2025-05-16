@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="bht03LookupApp">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scopes Configuration</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .bg-light-red {
+        background-color: #ffebee !important;
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <div class="container py-4" ng-controller="ScopesController">
+      <div class="row justify-content-center">
+        <div class="col-md-10">
+          <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+              <h4 class="mb-0">Scopes Configuration</h4>
+            </div>
+            <div class="card-body">
+              <!-- Create Scope Form -->
+              <hr class="my-4" />
+              <h5 class="mb-3">Create Scope</h5>
+              <form ng-submit="submitScope()">
+                <div class="mb-3">
+                  <label for="environment" class="form-label"
+                    >Environment</label
+                  >
+                  <select
+                    class="form-select"
+                    id="environment"
+                    ng-model="selectedEnvironment"
+                    required
+                  >
+                    <option value="">Select Environment</option>
+                    <option value="DEV">DEV</option>
+                    <option value="STAGE">STAGE</option>
+                    <option value="PROD">PROD</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="scopeName" class="form-label">Scope Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="scopeName"
+                    ng-model="scopeName"
+                    placeholder="Enter scope name"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="authToken" class="form-label"
+                    >Auth Token (Optional)
+                    <span class="form-text text-muted" ng-if="tokenExpiration">
+                      Token expires: {{tokenExpiration}}
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="authToken"
+                    ng-model="authToken"
+                    ng-class="{'bg-light-red': isTokenExpired(authToken)}"
+                    placeholder="Enter auth token (optional)"
+                  />
+                </div>
+                <div class="d-grid gap-2">
+                  <button
+                    class="btn btn-primary"
+                    type="submit"
+                    ng-disabled="loading"
+                  >
+                    <span ng-if="!loading">Create</span>
+                    <span
+                      ng-if="loading"
+                      class="spinner-border spinner-border-sm me-2"
+                    ></span>
+                    <span ng-if="loading">Processing...</span>
+                  </button>
+                  <span ng-if="error" class="alert alert-danger mt-2">
+                    {{response}}
+                  </span>
+                </div>
+              </form>
+
+              <!-- Delete Scope Form -->
+              <hr class="my-4" />
+              <h5 class="mb-3">Delete Scope</h5>
+              <form ng-submit="deleteScope()">
+                <div class="mb-3">
+                  <label for="deleteEnvironment" class="form-label"
+                    >Environment</label
+                  >
+                  <select
+                    class="form-select"
+                    id="deleteEnvironment"
+                    ng-model="deleteEnvironment"
+                    required
+                  >
+                    <option value="">Select Environment</option>
+                    <option value="DEV">DEV</option>
+                    <option value="STAGE">STAGE</option>
+                    <option value="PROD">PROD</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="scopeId" class="form-label">Scope ID</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="scopeId"
+                    ng-model="scopeId"
+                    placeholder="Enter scope ID"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="deleteAuthToken" class="form-label"
+                    >Auth Token (Optional)
+                    <span class="form-text text-muted" ng-if="tokenExpiration">
+                      Token expires: {{tokenExpiration}}
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="deleteAuthToken"
+                    ng-model="deleteAuthToken"
+                    ng-class="{'bg-light-red': isTokenExpired(deleteAuthToken)}"
+                    placeholder="Enter auth token (optional)"
+                  />
+                </div>
+                <div class="d-grid gap-2">
+                  <button
+                    class="btn btn-danger"
+                    type="submit"
+                    ng-disabled="deleteLoading"
+                  >
+                    <span ng-if="!deleteLoading">Delete</span>
+                    <span
+                      ng-if="deleteLoading"
+                      class="spinner-border spinner-border-sm me-2"
+                    ></span>
+                    <span ng-if="deleteLoading">Processing...</span>
+                  </button>
+                  <div ng-if="error" class="alert alert-danger mt-2">
+                    {{response}}
+                  </div>
+                </div>
+              </form>
+
+              <!-- Activate Scope Form -->
+              <hr class="my-4" />
+              <h5 class="mb-3">Activate Scope</h5>
+              <form ng-submit="activateScope()">
+                <div class="mb-3">
+                  <label for="activateEnvironment" class="form-label">Environment</label>
+                  <select
+                    class="form-select"
+                    id="activateEnvironment"
+                    ng-model="activateEnvironment"
+                    required
+                  >
+                    <option value="">Select Environment</option>
+                    <option value="DEV">DEV</option>
+                    <option value="STAGE">STAGE</option>
+                    <option value="PROD">PROD</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="activateScopeName" class="form-label">Scope Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="activateScopeName"
+                    ng-model="activateScopeName"
+                    placeholder="Enter scope name"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="customerId" class="form-label">Customer ID</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="customerId"
+                    ng-model="customerId"
+                    placeholder="Enter customer ID"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="activateAuthToken" class="form-label">Auth Token (Optional)
+                    <span class="form-text text-muted" ng-if="tokenExpiration">
+                      Token expires: {{tokenExpiration}}
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="activateAuthToken"
+                    ng-model="activateAuthToken"
+                    placeholder="Enter auth token (optional)"
+                  />
+                </div>
+                <div class="d-grid gap-2">
+                  <button
+                    class="btn btn-success"
+                    type="submit"
+                    ng-disabled="activateLoading"
+                  >
+                    <span ng-if="!activateLoading">Activate</span>
+                    <span
+                      ng-if="activateLoading"
+                      class="spinner-border spinner-border-sm me-2"
+                    ></span>
+                    <span ng-if="activateLoading">Processing...</span>
+                  </button>
+                  <div ng-if="activateError" class="alert alert-danger mt-2">
+                    {{activateResponse}}
+                  </div>
+                </div>
+              </form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

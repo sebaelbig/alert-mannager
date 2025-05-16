@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="bht03LookupApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BHT03 Lookup Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        .loading-spinner {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+            vertical-align: text-bottom;
+            border: 0.25em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spinner 0.75s linear infinite;
+        }
+
+        @keyframes spinner {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .json-content {
+            font-family: monospace;
+            white-space: pre;
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.25rem;
+            max-height: 400px;
+            overflow: auto;
+        }
+
+        .result-card {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+<div class="container py-4" ng-controller="LookupController">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">BHT03 Lookup Tool</h4>
+                </div>
+                <div class="card-body">
+                    <form ng-submit="performLookup()">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="Enter BHT03 Code"
+                                   ng-model="bht03Code" required>
+                            <button class="btn btn-primary" type="submit" ng-disabled="loading">
+                                <span ng-if="!loading">Search</span>
+                                <span ng-if="loading" class="loading-spinner me-2"></span>
+                                <span ng-if="loading">Searching...</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Error Alert -->
+                    <div class="alert alert-danger" ng-if="error">
+                        <strong>Error:</strong> {{error}}
+                    </div>
+
+                    <!-- Results Section -->
+                    <div ng-if="prsUuid" class="mt-4">
+                        <div class="card mb-4">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">PRS UUID</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" value="{{prsUuid}}" readonly>
+                                    <button class="btn btn-outline-secondary" type="button"
+                                            onclick="navigator.clipboard.writeText(navigator.clipboard.writeText(document.getElementById('request_body').getHTML().replaceAll()))">
+                                        Copy
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SQL Results Section -->
+                        <div ng-if="!!sqlResults">
+                            <h5 class="mb-3">SQL Query Results</h5>
+
+                            <!-- Request Details Card -->
+                            <div class="card result-card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <span>Request Details</span>
+                                    <button class="btn btn-sm btn-outline-secondary" 
+                                            ng-click="copyToClipboard(sqlResults.requestBodyJSON)">
+                                        <i class="bi bi-clipboard"></i> Copy Raw JSON
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Realm ID:</strong> {{sqlResults.requestBody.realmId}}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Customer ID:</strong> {{sqlResults.requestBody.customerId}}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Provider Code:</strong> {{sqlResults.requestBody.providerCode}}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Member Number:</strong> {{sqlResults.requestBody.memberNumber}}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Group Number:</strong> {{sqlResults.requestBody.groupNumber}}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Reco Payer ID:</strong> {{sqlResults.requestBody.recoPayerId}}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <strong>Date of Service:</strong> {{sqlResults.requestBody.dateOfService | date:'MM/dd/yyyy'}}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <strong>Date of Birth:</strong> {{sqlResults.requestBody.dateOfBirth | date:'MM/dd/yyyy'}}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <strong>Encounter RID:</strong> {{sqlResults.requestBody.encounterRid}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Eligibility Response Section -->
+                            <div class="card mt-3">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Eligibility Response</h6>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Header Information -->
+                                    <div class="mb-4">
+                                        <h6>Header Information</h6>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <strong>Sender ID:</strong> {{sqlResults.requestBody.eligibilityResponse.header.senderId}}
+                                            </div>
+                                            <div class="col-md-4">
+                                                <strong>Receiver ID:</strong> {{sqlResults.requestBody.eligibilityResponse.header.recvId}}
+                                            </div>
+                                            <div class="col-md-4">
+                                                <strong>Transaction Time:</strong> {{sqlResults.requestBody.eligibilityResponse.header.interchangeTimeStamp | date:'MM/dd/yyyy HH:mm:ss'}}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Payer Information -->
+                                    <div class="mb-4">
+                                        <h6>Payer Information</h6>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <strong>Name:</strong> {{sqlResults.requestBody.eligibilityResponse.payer.lastName}}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>ID Code:</strong> {{sqlResults.requestBody.eligibilityResponse.payer.idCode}}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Subscriber Information -->
+                                    <div class="mb-4">
+                                        <h6>Subscriber Information</h6>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <strong>Name:</strong> {{sqlResults.requestBody.eligibilityResponse.subscriber.firstName}} {{sqlResults.requestBody.eligibilityResponse.subscriber.lastName}}
+                                            </div>
+                                            <div class="col-md-4">
+                                                <strong>ID:</strong> {{sqlResults.requestBody.eligibilityResponse.subscriber.idCode}}
+                                            </div>
+                                            <div class="col-md-4">
+                                                <strong>Relationship:</strong> {{sqlResults.requestBody.eligibilityResponse.subscriber.indRelCode}}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Benefits Accordion -->
+                                    <div class="mb-4">
+                                        <button class="btn btn-outline-primary mb-3" ng-click="showBenefits = !showBenefits">
+                                            <i class="bi" ng-class="{'bi-chevron-down': !showBenefits, 'bi-chevron-up': showBenefits}"></i>
+                                            {{showBenefits ? 'Hide' : 'Show'}} Benefits
+                                        </button>
+                                        <div class="accordion" id="benefitsAccordion" ng-show="showBenefits">
+                                            <div class="accordion-item" ng-repeat="benefit in sqlResults.requestBody.eligibilityResponse.benefits">
+                                                <h2 class="accordion-header">
+                                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#benefit{{$index}}">
+                                                        {{benefit.benefitType}} - {{benefit.coverageLevel}}
+                                                    </button>
+                                                </h2>
+                                            <div id="benefit{{$index}}" class="accordion-collapse collapse" data-bs-parent="#benefitsAccordion">
+                                                <div class="accordion-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6" ng-if="benefit.serviceTypes.length > 0">
+                                                            <strong>Service Types:</strong>
+                                                            <ul class="list-unstyled">
+                                                                <li ng-repeat="type in benefit.serviceTypes">{{type}}</li>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="col-md-6" ng-if="benefit.msgs.length > 0">
+                                                            <strong>Messages:</strong>
+                                                            <ul class="list-unstyled">
+                                                                <li ng-repeat="msg in benefit.msgs">{{msg}}</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mt-2">
+                                                        <div class="col-md-4" ng-if="benefit.planNetwork">
+                                                            <strong>Network:</strong> {{benefit.planNetwork}}
+                                                        </div>
+                                                        <div class="col-md-4" ng-if="benefit.percentage">
+                                                            <strong>Percentage:</strong> {{benefit.percentage * 100}}%
+                                                        </div>
+                                                        <div class="col-md-4" ng-if="benefit.amount">
+                                                            <strong>Amount:</strong> ${{benefit.amount}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mt-2" ng-if="benefit.dates.length > 0">
+                                                        <div class="col-12">
+                                                            <strong>Dates:</strong>
+                                                            <ul class="list-unstyled">
+                                                                <li ng-repeat="date in benefit.dates">
+                                                                    {{date.datePeriodQlfr}}: {{date.startDate | date:'MM/dd/yyyy'}} - {{date.endDate | date:'MM/dd/yyyy'}}
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+                            <!-- Response Body Section -->
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>SQL Result</span>
+                            </div>
+                            <div class="card-body">
+                                <ul class="nav nav-tabs" id="resultTab" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="request-tab"
+                                                data-bs-toggle="tab"
+                                                data-bs-target="#request" type="button" role="tab">
+                                            Request Body
+                                            <a style="color: #0d6efd;"
+                                               onclick="navigator.clipboard.writeText(document.getElementById('request_body').getHTML().replaceAll())">
+                                                Copy
+                                            </a>
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="response-tab" data-bs-toggle="tab"
+                                                data-bs-target="#response" type="button" role="tab">
+                                            Response Body
+                                        </button>
+                                    </li>
+                                </ul>
+                                <div class="tab-content p-3" id="resultTabContent">
+                                    <div class="tab-pane fade show active" id="request" role="tabpanel">
+                                        <div class="json-content" id="request_body">
+                                            {{formatJson(sqlResults.requestBody)}}
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="response" role="tabpanel">
+                                        <div class="card mb-3">
+                                            <div class="card-header">
+                                                <h6 class="mb-0">Transaction Details</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <strong>Transaction ID:</strong> {{sqlResults.responseBody.transactionId}}
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <strong>Encounter RID:</strong> {{sqlResults.responseBody.encounterRid}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="mb-0">Generated Alerts</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="table-responsive" ng-if="sqlResults.responseBody.generatedAlerts.length > 0">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Product</th>
+                                                                <th>Text</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="alert in sqlResults.responseBody.generatedAlerts">
+                                                                <td>{{alert.product}}</td>
+                                                                <td>{{alert.text}}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="alert alert-info" ng-if="!sqlResults.responseBody.generatedAlerts || sqlResults.responseBody.generatedAlerts.length === 0">
+                                                    No alerts generated.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info mt-3" ng-if="!sqlResults.requestBody && !sqlResults.responseBody">
+                                No SQL results found for this UUID.
+                            </div>
+                        </div>
+
+                        <!-- Rule Configurations Section -->
+                        <div ng-if="ruleConfigurations.length > 0" class="mt-4">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="mb-0">Rule Configurations</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Realm Ref ID</th>
+                                                    <th>Alert Rule ID</th>
+                                                    <th>Rule Name</th>
+                                                    <th>Alert Text</th>
+                                                    <th>Rule Body</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="rule in ruleConfigurations">
+                                                    <td>{{rule.realmRefId}}</td>
+                                                    <td>{{rule.alertRuleId}}</td>
+                                                    <td>{{rule.ruleName}}</td>
+                                                    <td>{{rule.alertText}}</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary" 
+                                                                ng-click="toggleRuleBody(rule)">
+                                                            View Rule Body
+                                                        </button>
+                                                        <div class="collapse mt-2" id="ruleBody{{$index}}">
+                                                            <div class="card">
+                                                                <div class="card-body">
+                                                                    <pre class="json-content">{{formatJson(rule.ruleBody)}}</pre>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mt-3" ng-if="ruleConfigurations && ruleConfigurations.length === 0">
+                            No rule configurations found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Required scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

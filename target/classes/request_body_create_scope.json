@@ -1,0 +1,9 @@
+{
+  "relm": 1,
+  "scope": {
+    "disabledByDefault": false,
+    "name": "PETERSON_ALERTS",
+    "productId": 3,
+    "terminateAfterHit": true
+  }
+}
