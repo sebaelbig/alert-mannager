@@ -1,0 +1,65 @@
+<div class="rule-response" *ngIf="rules">
+  <!-- Error Message -->
+  <div *ngIf="hasErrorMessage()" class="error-message">
+    <i class="fas fa-exclamation-circle"></i> {{ error }}
+  </div>
+
+  <!-- Rule Array Response -->
+  <div *ngIf="isRuleArray() && !hasErrorMessage()" class="rule-data">
+    <div class="summary">
+      <div class="stat">
+        <label>Rules Found:</label>
+        <span>{{ rules.length }}</span>
+      </div>
+    </div>
+
+    <div class="rules" *ngIf="rules.length">
+      <div *ngFor="let rule of rules" class="rule-item">
+        <h3>
+          {{ rule.ruleName || "Unnamed Rule" }}(Id: {{ rule.alertRuleId }})
+        </h3>
+        <h4>Details</h4>
+        <div class="details">
+          <div class="detail-row" *ngIf="rule.scopeName">
+            <label>Scope:</label>
+            <span>{{ rule.scopeName }}</span>
+          </div>
+
+          <div class="detail-row" *ngIf="rule.alertText">
+            <label>Alert Text:</label>
+            <span>{{ rule.alertText }}</span>
+          </div>
+
+          <!-- <div class="detail-row" *ngIf="rule.providerCode">
+            <label>Provider Code:</label>
+            <span>{{ rule.providerCode }}</span>
+          </div> -->
+
+          <div class="detail-row status">
+            <label>Status:</label>
+            <span [class.disabled]="rule.isDisabled"
+              >{{ rule.isDisabled ? "Disabled" : "Active" }} in
+              {{ getRealm(rule.realmRefId) }} for Customer:
+              {{ rule.customerId }} or Payer: {{ rule.payerId }}</span
+            >
+          </div>
+        </div>
+
+        <!-- Replace line 55 with this: -->
+        <div class="rule-body" *ngIf="rule.ruleBody">
+          <h4>Rule Body:</h4>
+          <pre>{{ trimRuleBody(rule.ruleBody) }}</pre>
+        </div>
+
+        <!-- Delete Button -->
+        <button class="delete-button" (click)="confirmDelete(rule)">
+          Delete Rule
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="isRuleArray() && rules.length === 0" class="no-data">
+      No rules found.
+    </div>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+<div class="card result-card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span>Request Details</span>
+    <button
+      class="btn btn-sm btn-outline-secondary"
+      (click)="copyToClipboard(sqlResults.requestBodyJSON)"
+    >
+      <i class="bi bi-clipboard"></i> Copy Raw JSON
+    </button>
+  </div>
+  <div class="card-body">
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <strong>Realm ID:</strong>
+        {{ sqlResults.requestBody.realmId }}
+      </div>
+      <div class="col-md-4">
+        <strong>Customer ID:</strong>
+        {{ sqlResults.requestBody.customerId }}
+      </div>
+      <div class="col-md-4">
+        <strong>Provider Code:</strong>
+        {{ sqlResults.requestBody.providerCode }}
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <strong>Member Number:</strong>
+        {{ sqlResults.requestBody.memberNumber }}
+      </div>
+      <div class="col-md-4">
+        <strong>Group Number:</strong>
+        {{ sqlResults.requestBody.groupNumber }}
+      </div>
+      <div class="col-md-4">
+        <strong>Reco Payer ID:</strong>
+        {{ sqlResults.requestBody.recoPayerId }}
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <strong>Date of Service:</strong>
+        {{ sqlResults.requestBody.dateOfService | date : "MM/dd/yyyy" }}
+      </div>
+      <div class="col-md-6">
+        <strong>Date of Birth:</strong>
+        {{ sqlResults.requestBody.dateOfBirth | date : "MM/dd/yyyy" }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <strong>Encounter RID:</strong>
+        {{ sqlResults.requestBody.encounterRid }}
+      </div>
+    </div>
+  </div>
+</div>

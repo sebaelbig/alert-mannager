@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class DateDTO {
     private String datePeriodQlfr;
+    private String datePeriodQlfrDesc;
     private Long startDate;
     private Long endDate;
 

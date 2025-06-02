@@ -1,0 +1,51 @@
+<div *ngIf="ruleConfigurations.length > 0" class="mt-4">
+  <div class="card">
+    <div class="card-header bg-info text-white">
+      <h5 class="mb-0">Rule Configurations</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Realm Ref ID</th>
+              <th>Alert Rule ID</th>
+              <th>Rule Name</th>
+              <th>Alert Text</th>
+              <th>Rule Body</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let rule of ruleConfigurations; let i = index">
+              <td>{{ rule.realmRefId }}</td>
+              <td>{{ rule.alertRuleId }}</td>
+              <td>{{ rule.ruleName }}</td>
+              <td>{{ rule.alertText }}</td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="toggleRuleBody(rule, i)"
+                >
+                  View Rule Body
+                </button>
+                <div class="collapse mt-2" [id]="'ruleBody' + i">
+                  <div class="card">
+                    <div class="card-body">
+                      <pre class="json-content">{{ rule.ruleBody | json }}</pre>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div
+  class="alert alert-info mt-3"
+  *ngIf="ruleConfigurations && ruleConfigurations.length === 0"
+>
+  No rule configurations found.
+</div>

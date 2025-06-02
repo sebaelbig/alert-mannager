@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.recondo.lookup.generation.eligibility.parts.Contact;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EntityDTO {
@@ -21,7 +22,7 @@ public class EntityDTO {
     private String maintReasonCode;
     private List<ReferenceDTO> refs;
     private List<DateDTO> dates;
-    private List<ContactDTO> contacts;
+    private List<Contact> contacts;
     private List<String> diagnosisCodes;
     
     // Add address-related fields
@@ -171,11 +172,11 @@ public class EntityDTO {
         this.maintReasonCode = maintReasonCode;
     }
 
-    public List<ContactDTO> getContacts() {
+    public List<Contact> getContacts() {
         return contacts;
     }
 
-    public void setContacts(List<ContactDTO> contacts) {
+    public void setContacts(List<Contact> contacts) {
         this.contacts = contacts;
     }
 

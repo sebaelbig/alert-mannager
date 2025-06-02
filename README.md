@@ -1,27 +1,59 @@
-# alert-mannager
+# Bht03Lookup
 
-Nuestro sistema se encarga de recibir un objeto JSON que representa a una atención médica y en base a esa entrada, generar una salida con alertas dependiendo de la lógica.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.12.
 
-Ese JSON se genera partiendo de un texto codificado bajo el estandar de traspaso de información médica mundial HL7.
+## Development server
 
+To start a local development server, run:
 
-## Tareas
-Al momento de tomar un ticket lo primero que se analiza es si es crear una nueva regla o actualizarla.
+```bash
+ng serve
+```
 
-## Cosas a tener en cuenta antes de modificar/crear una regla
+Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
-### Cuenta de testeo
-Por lo general los tickets son provistos de una cuenta de test, estas pueden estar indicadas por su código BHT03 o por su PRS UUID.
+## Code scaffolding
 
-Si solo tenemos BHT03: Para obtener un JSON el cual podamos usar para testear si nuestros cambios estan de a cuerdo a lo pedido, utilizamos un sitio el cual consiste en un formulario en donde ponemos el BHT03 y nos recupera la información de esa accion médica y junto con ello un PRS UUID, el cual nos va a servir para recuperar el JSON de la base de datos.
+Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
 
-Paginas para obtener el PRS UUID en base al BHT03:
+```bash
+ng generate component component-name
+```
 
-1. PRS Multitool v1
-(se puede obtener el PRS UUID a traves de un GET)
+For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
 
-2. PRS Multitool v2
+```bash
+ng generate --help
+```
 
-3. Sherpa
- 
-## Crear una regla
+## Building
+
+To build the project run:
+
+```bash
+ng build
+```
+
+This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+
+## Running unit tests
+
+To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+
+```bash
+ng test
+```
+
+## Running end-to-end tests
+
+For end-to-end (e2e) testing, run:
+
+```bash
+ng e2e
+```
+
+Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+
+## Additional Resources
+
+For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

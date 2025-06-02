@@ -1,0 +1,117 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">Scopes Configuration</h4>
+        </div>
+        <div class="card-body">
+          <!-- Common Fields -->
+          <app-common-fields
+            [commonEnvironment]="commonEnvironment"
+            [commonAuthToken]="commonAuthToken"
+            (commonEnvironmentChange)="
+              onCommonFieldsChange('environment', $event)
+            "
+            (commonAuthTokenChange)="onCommonFieldsChange('token', $event)"
+          ></app-common-fields>
+
+          <!-- Create Scope Form -->
+          <hr class="my-4" />
+          <h5 class="mb-3">Create Scope</h5>
+          <form (ngSubmit)="create()">
+            <div class="mb-3">
+              <label for="scopeName">Scope Name:</label>
+              <input
+                type="text"
+                id="scopeName"
+                name="scopeName"
+                [(ngModel)]="scopeName"
+                class="form-control"
+                placeholder="Enter scope name"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="scopeSelect">Or Select Existing Scope:</label>
+              <select
+                id="scopeSelect"
+                name="scopeSelect"
+                [(ngModel)]="selectedScope"
+                class="form-control"
+              >
+                <option value="">Select a scope...</option>
+                <option *ngFor="let scope of scopes" [value]="scope.name">
+                  {{ scope.name }}
+                </option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="customerId">Customer ID:</label>
+              <input
+                type="text"
+                id="customerId"
+                name="customerId"
+                [(ngModel)]="customerId"
+                class="form-control"
+                placeholder="Enter customer ID"
+              />
+            </div>
+
+            <div class="d-grid gap-2">
+              <div class="row">
+                <div class="col d-flex gap-2">
+                  <button
+                    class="btn btn-primary"
+                    type="submit"
+                    [disabled]="loading || !scopeName"
+                  >
+                    <span *ngIf="!loading">Create Scope</span>
+                    <span
+                      *ngIf="loading"
+                      class="spinner-border spinner-border-sm me-2"
+                    ></span>
+                    <span *ngIf="loading">Creating...</span>
+                  </button>
+                  <button
+                    class="btn btn-success"
+                    type="button"
+                    (click)="getActivation()"
+                    [disabled]="loading || (!scopeName && !selectedScope)"
+                  >
+                    <span *ngIf="!loading">Get activations</span>
+                    <span
+                      *ngIf="loading"
+                      class="spinner-border spinner-border-sm me-2"
+                    ></span>
+                    <span *ngIf="loading">Getting activations...</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    [disabled]="loading || !scopeName"
+                    (click)="deleteScope()"
+                  >
+                    <span *ngIf="!loading">Delete Scope</span>
+                    <span
+                      *ngIf="loading"
+                      class="spinner-border spinner-border-sm me-2"
+                    ></span>
+                    <span *ngIf="loading">Deleting...</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <!-- Response Section -->
+          <div *ngIf="response" class="mt-4">
+            <app-activation-response [response]="response"></app-activation-response>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

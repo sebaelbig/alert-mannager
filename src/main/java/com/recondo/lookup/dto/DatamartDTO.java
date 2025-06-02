@@ -1,14 +1,16 @@
 package com.recondo.lookup.dto;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.recondo.lookup.generation.AlertRequest;
+import com.recondo.lookup.generation.AlertResponse;
 
 public class DatamartDTO {
 
-    private RequestBodyDTO requestBody;
+    private AlertRequest requestBody;
     private String requestBodyJSON;
-    private AlertResponseDTO responseBody;
+    private AlertResponse responseBody;
 
-    public RequestBodyDTO getRequestBody() {
+    public AlertRequest getRequestBody() {
         return requestBody;
     }
 
@@ -16,7 +18,7 @@ public class DatamartDTO {
         try {
             this.requestBodyJSON = requestBody;
             ObjectMapper mapper = new ObjectMapper();
-            this.requestBody = mapper.readValue(requestBody, RequestBodyDTO.class);
+            this.requestBody = mapper.readValue(requestBody, AlertRequest.class);
         } catch (Exception e) {
             throw new RuntimeException("Error deserializing request body", e);
         }
@@ -30,14 +32,14 @@ public class DatamartDTO {
         this.requestBodyJSON = requestBodyJSON;
     }
 
-    public AlertResponseDTO getResponseBody() {
+    public AlertResponse getResponseBody() {
         return responseBody;
     }
 
     public void setResponseBody(String responseBody) {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            this.responseBody = mapper.readValue(responseBody, AlertResponseDTO.class);
+            this.responseBody = mapper.readValue(responseBody, AlertResponse.class);
         } catch (Exception e) {
             throw new RuntimeException("Error deserializing response body", e);
         }

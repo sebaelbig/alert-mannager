@@ -1,0 +1,33 @@
+<div class="mb-3">
+  <label for="commonEnvironment" class="form-label">Environment</label>
+  <select
+    class="form-select"
+    id="commonEnvironment"
+    [ngModel]="commonEnvironment"
+    (ngModelChange)="onEnvironmentChange($event)"
+    name="commonEnvironment"
+    required
+  >
+    <option value="">Select Environment</option>
+    <option value="DEV">DEV</option>
+    <option value="STAGE">STAGE</option>
+    <option value="PROD">PROD</option>
+  </select>
+</div>
+
+<div class="mb-3">
+  <label for="commonAuthToken" class="form-label">Auth Token
+    <span class="form-text text-muted" ng-if="tokenExpiration">
+      Token expires: {{tokenExpiration}}
+    </span>
+  </label>
+  <input
+    type="text"
+    class="form-control"
+    id="commonAuthToken"
+    [ngModel]="commonAuthToken"
+    (ngModelChange)="onAuthTokenChange($event)"
+    [ngClass]="{'bg-light-red': isTokenExpired(commonAuthToken)}"
+    placeholder="Enter auth token (optional)"
+  />
+</div>

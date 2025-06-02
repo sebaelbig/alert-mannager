@@ -1,0 +1,8 @@
+{
+  "/api": {
+    "target": "http://localhost:8080/bht03_lookup_tool_war_exploded",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

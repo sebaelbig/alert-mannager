@@ -1,0 +1,92 @@
+.activation-response {
+  padding: 1rem;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.error-message {
+  color: #dc3545;
+  padding: 1rem;
+  background: #fdf2f2;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.summary {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat label {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.stat span {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.activation-item {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+}
+
+.activation-item h3 {
+  margin: 0 0 1rem;
+  color: #2c3e50;
+}
+
+.entity-item {
+  margin: 0.5rem 0;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.entity-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.status {
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.875rem;
+  background: #28a745;
+  color: white;
+}
+
+.status.disabled {
+  background: #dc3545;
+}
+
+.details {
+  font-size: 0.875rem;
+  color: #495057;
+}
+
+.update-info {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+}

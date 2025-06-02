@@ -1,0 +1,138 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">BHT03 Lookup Tool</h4>
+        </div>
+        <div class="card-body">
+          <!-- Common Fields -->
+          <app-common-fields
+            [commonEnvironment]="commonEnvironment"
+            [commonAuthToken]="commonAuthToken"
+            (commonEnvironmentChange)="
+              onCommonFieldsChange('environment', $event)
+            "
+            (commonAuthTokenChange)="onCommonFieldsChange('token', $event)"
+          ></app-common-fields>
+
+          <!-- Lookup Form -->
+          <form (ngSubmit)="performLookup()">
+            <div class="input-group mb-3">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter BHT03 Code / Account"
+                [(ngModel)]="bht03Code"
+                name="bht03Code"
+                required
+              />
+              <button
+                class="btn btn-primary"
+                type="submit"
+                [disabled]="loading"
+              >
+                <span *ngIf="!loading">Search</span>
+                <span
+                  *ngIf="loading"
+                  class="spinner-border spinner-border-sm me-2"
+                ></span>
+                <span *ngIf="loading">Searching...</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Error Alert -->
+          <div class="alert alert-danger" *ngIf="error">
+            <strong>Error:</strong> {{ error }}
+          </div>
+
+          <!-- Results Section -->
+          <div class="mt-4">
+            <div class="card mb-4">
+              <div class="card-header bg-success text-white">
+                <h5 class="mb-0">PRS UUID (Enter or Search)</h5>
+              </div>
+              <div class="card-body">
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control"
+                    [(ngModel)]="prsUuid"
+                    name="prsUuid"
+                  />
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    (click)="copyToClipboard(prsUuid ? prsUuid : '')"
+                  >
+                    Copy
+                  </button>
+                  <button
+                    class="btn btn-outline-secondary ms-2"
+                    (click)="refreshDetails()"
+                    [disabled]="!prsUuid"
+                  >
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- SQL Results Section -->
+            <div *ngIf="!!sqlResults">
+              <h5 class="mb-3">SQL Query Results</h5>
+
+              <!-- Request Details Card -->
+              <app-request-details
+                [sqlResults]="sqlResults"
+              ></app-request-details>
+
+              <!-- Eligibility Response Section -->
+              <div class="card mt-3">
+                <div class="card-header">
+                  <h6 class="mb-0">Eligibility Response</h6>
+                </div>
+
+                <app-eligibility-response
+                  [eligibilityResponse]="
+                    sqlResults.requestBody.eligibilityResponse
+                  "
+                ></app-eligibility-response>
+
+                <!-- Response Body Section -->
+                <app-sql-results [sqlResults]="sqlResults"></app-sql-results>
+              </div>
+
+              <!-- Rule Configurations Section -->
+              <app-rule-configurations
+                [ruleConfigurations]="ruleConfigurations"
+              ></app-rule-configurations>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div
+    #toast
+    class="toast"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+  >
+    <div class="toast-header">
+      <strong class="me-auto">Notification</strong>
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="toast"
+        aria-label="Close"
+      ></button>
+    </div>
+    <div class="toast-body">Copied to clipboard!</div>
+  </div>
+</div>

@@ -1,0 +1,163 @@
+<div class="card-body">
+  <!-- Header Information -->
+  <div
+    class="mb-4"
+    *ngIf="eligibilityResponse.header"
+  >
+    <h6>Header Information</h6>
+    <div class="row">
+      <div class="col-md-4">
+        <strong>Sender ID:</strong>
+        {{ eligibilityResponse.header.senderId }}
+      </div>
+      <div class="col-md-4">
+        <strong>Receiver ID:</strong>
+        {{ eligibilityResponse.header.recvId }}
+      </div>
+      <div class="col-md-4">
+        <strong>Transaction Time:</strong>
+        {{ eligibilityResponse.header.interchangeTimeStamp | date : "MM/dd/yyyy HH:mm:ss" }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Payer Information -->
+  <div
+    class="mb-4"
+    *ngIf="eligibilityResponse.payer"
+  >
+    <h6>Payer Information</h6>
+    <div class="row">
+      <div class="col-12">
+        <strong>Name:</strong>
+        {{ eligibilityResponse.payer.lastName }}
+      </div>
+      <div class="col-md-6">
+        <strong>ID Code:</strong>
+        {{ eligibilityResponse.payer.idCode }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Subscriber Information -->
+  <div
+    class="mb-4"
+    *ngIf="eligibilityResponse.subscriber"
+  >
+    <h6>Subscriber Information</h6>
+    <div class="row">
+      <div class="col-md-4">
+        <strong>Name:</strong>
+        {{ eligibilityResponse.subscriber.firstName }}
+        {{ eligibilityResponse.subscriber.lastName }}
+      </div>
+      <div class="col-md-4">
+        <strong>ID:</strong>
+        {{ eligibilityResponse.subscriber.idCode }}
+      </div>
+      <div class="col-md-4">
+        <strong>Relationship:</strong>
+        {{ eligibilityResponse.subscriber.indRelCode }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Benefits Accordion -->
+  <div class="mb-4">
+    <button
+      class="btn btn-outline-primary mb-3"
+      (click)="showBenefits = !showBenefits"
+    >
+      <i
+        class="bi"
+        [ngClass]="{
+          'bi-chevron-down': !showBenefits,
+          'bi-chevron-up': showBenefits
+        }"
+      ></i>
+      {{ showBenefits ? "Hide" : "Show" }} Benefits
+    </button>
+    <div
+      class="accordion"
+      id="benefitsAccordion"
+      [ngStyle]="{ display: showBenefits ? 'block' : 'none' }"
+    >
+      <div
+        class="accordion-item"
+        *ngFor="let benefit of eligibilityResponse.benefits; let i = index"
+      >
+        <h2 class="accordion-header">
+          <button
+            class="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            [attr.data-bs-target]="'#benefit' + i"
+          >
+            {{ benefit.benefitType }} -
+            {{ benefit.coverageLevel }}
+          </button>
+        </h2>
+        <div
+          [id]="'benefit' + i"
+          class="accordion-collapse collapse"
+          data-bs-parent="#benefitsAccordion"
+        >
+          <div class="accordion-body">
+            <div class="row">
+              <div
+                class="col-md-6"
+                *ngIf="benefit.serviceTypes.length > 0"
+              >
+                <strong>Service Types:</strong>
+                <ul class="list-unstyled">
+                  <li *ngFor="let type of benefit.serviceTypes">
+                    {{ type }}
+                  </li>
+                </ul>
+              </div>
+              <div
+                class="col-md-6"
+                *ngIf="benefit.msgs.length > 0"
+              >
+                <strong>Messages:</strong>
+                <ul class="list-unstyled">
+                  <li *ngFor="let msg of benefit.msgs">
+                    {{ msg }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-md-4" *ngIf="benefit.planNetwork">
+                <strong>Network:</strong>
+                {{ benefit.planNetwork }}
+              </div>
+              <div class="col-md-4" *ngIf="benefit.percentage">
+                <strong>Percentage:</strong>
+                {{ benefit.percentage * 100 }}%
+              </div>
+              <div class="col-md-4" *ngIf="benefit.amount">
+                <strong>Amount:</strong> ${{ benefit.amount }}
+              </div>
+            </div>
+            <div
+              class="row mt-2"
+              *ngIf="benefit.dates.length > 0"
+            >
+              <div class="col-12">
+                <strong>Dates:</strong>
+                <ul class="list-unstyled">
+                  <li *ngFor="let date of benefit.dates">
+                    {{ date.datePeriodQlfr }}:
+                    {{ date.startDate | date : "MM/dd/yyyy" }} -
+                    {{ date.endDate | date : "MM/dd/yyyy" }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

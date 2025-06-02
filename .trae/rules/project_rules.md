@@ -1,0 +1,1 @@
+when you create components in Angular use standalone components and the template should be in a separate file with the same name as the component.

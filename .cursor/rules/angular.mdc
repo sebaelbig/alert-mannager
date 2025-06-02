@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+every time that creates an Angular Component should be based on Angular 19 as an standalone component
+the HTML template should always be in a separate file
+
+
+do not apply the changes until I accepted 

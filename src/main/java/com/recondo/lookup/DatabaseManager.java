@@ -31,7 +31,7 @@ public class DatabaseManager {
     // Alert Configuration PROD
     private static final String DB_CONFIGURATION_PROD_URL = "jdbc:postgresql://ploudb110.recondo.vci:5432/alert_configuration_prod";
     private static final String DB_CONFIGURATION_PROD_USER = "alert_configuration_prod_user";
-    private static final String DB_CONFIGURATION_PROD_PASSWORD = "d;G#RC3ZbQuL|N";
+    private static final String DB_CONFIGURATION_PROD_PASSWORD = "p0j0123";
 
     static {
         try {

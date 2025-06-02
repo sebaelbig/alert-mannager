@@ -1,0 +1,72 @@
+<div class="activation-response" *ngIf="response">
+  <!-- Error Message -->
+  <div *ngIf="isErrorResponse(response)" class="error-message">
+    <i class="fas fa-exclamation-circle"></i> {{ response.error }}
+  </div>
+
+  <!-- Activation Response -->
+  <div *ngIf="isActivationResponse(response)" class="activation-data">
+    <div class="summary">
+      <div class="stat">
+        <label>Total Count:</label>
+        <span>{{ response.totalCount }}</span>
+      </div>
+      <div class="stat">
+        <label>Current Count:</label>
+        <span>{{ response.count }}</span>
+      </div>
+    </div>
+
+    <div class="activations" *ngIf="response.activations?.length">
+      <div
+        *ngFor="let activation of response.activations"
+        class="activation-item"
+      >
+        <h3>
+          {{ activation.name || "Unnamed Activation" }} (ID:
+          {{ activation.id }})
+        </h3>
+
+        <div class="entities" *ngIf="activation.activationEntities?.length">
+          <div
+            *ngFor="let entity of activation.activationEntities"
+            class="entity-item"
+          >
+            <div class="entity-header">
+              <span class="status" [class.disabled]="entity.isDisabled">
+                {{ entity.isDisabled ? "Disabled" : "Active" }}
+              </span>
+              <span class="provider" *ngIf="entity.providerCode">
+                Provider: {{ entity.providerCode }}
+              </span>
+            </div>
+
+            <div class="details">
+              <div>
+                <ng-container *ngIf="entity.customer; else allCustomers">
+                  Customer: {{ entity.customer.name }} (ID: {{ entity.customer.id }})
+                </ng-container>
+                <ng-template #allCustomers>Activated for all customers</ng-template>
+              </div>
+
+              <div *ngIf="entity.payer">
+                Payer: {{ entity.payer.name }}
+                <span *ngIf="entity.payer.recId"
+                  >(RecID: {{ entity.payer.recId }})</span
+                >
+              </div>
+              <div class="update-info">
+                Last Updated: {{ entity.lastUpdateTimestamp | date:'medium' }} by
+                {{ entity.lastUpdateUsername }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!response.activations?.length" class="no-data">
+      No activations found.
+    </div>
+  </div>
+</div>

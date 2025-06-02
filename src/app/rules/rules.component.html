@@ -1,0 +1,136 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">Rules Configuration</h4>
+        </div>
+        <div class="card-body">
+          <!-- Common Fields -->
+          <app-common-fields
+            [commonEnvironment]="commonEnvironment"
+            [commonAuthToken]="commonAuthToken"
+            (commonEnvironmentChange)="
+              onCommonFieldsChange('environment', $event)
+            "
+            (commonAuthTokenChange)="onCommonFieldsChange('token', $event)"
+          ></app-common-fields>
+
+          <!-- Search Rules Form -->
+          <hr class="my-4" />
+          <h5 class="mb-3">Search Rules</h5>
+          <form (ngSubmit)="searchRules()">
+            <div class="mb-3">
+              <label for="searchScope" class="form-label">Scope</label>
+              <select
+                class="form-select"
+                id="searchScope"
+                name="searchScope"
+                [(ngModel)]="selectedScope"
+              >
+                <option value="">All Scopes</option>
+                <option *ngFor="let scope of scopes" [value]="scope.name">
+                  {{ scope.name }}
+                </option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="searchRuleName" class="form-label">Rule Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="searchRuleName"
+                [(ngModel)]="searchRuleName"
+                name="searchRuleName"
+                placeholder="Search by rule name"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="searchAlertText" class="form-label">Alert Text</label>
+              <input
+                type="text"
+                class="form-control"
+                id="searchAlertText"
+                [(ngModel)]="searchAlertText"
+                name="searchAlertText"
+                placeholder="Search by alert text"
+              />
+            </div>
+
+            <div class="d-grid gap-2">
+              <button
+                class="btn btn-primary"
+                type="submit"
+                [disabled]="loading"
+              >
+                <span *ngIf="!loading">Search Rules</span>
+                <span
+                  *ngIf="loading"
+                  class="spinner-border spinner-border-sm me-2"
+                ></span>
+                <span *ngIf="loading">Searching...</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Create Rule Form -->
+          <hr class="my-4" />
+          <h5 class="mb-3">Create Rule</h5>
+          <form (ngSubmit)="submitRule()">
+            <div class="mb-3">
+              <label for="scope" class="form-label">Scope</label>
+              <select class="form-select" id="scope" name="scope">
+                <option value="">Select a scope</option>
+                <option *ngFor="let scope of scopes" [value]="scope">
+                  {{ scope.name }}
+                </option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+            <div class="mb-3">
+              <label for="rule" class="form-label">Rule</label>
+              <textarea
+                class="form-control"
+                id="rule"
+                [(ngModel)]="rule"
+                name="rule"
+                rows="10"
+                placeholder="Enter rule body"
+                required
+              ></textarea>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button
+                class="btn btn-primary"
+                type="submit"
+                [disabled]="loading"
+              >
+                <span *ngIf="!loading">Create Rule</span>
+                <span
+                  *ngIf="loading"
+                  class="spinner-border spinner-border-sm me-2"
+                ></span>
+                <span *ngIf="loading">Creating...</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Response Section -->
+          <!-- Replace the existing line with this: -->
+          <div *ngIf="searchResults" class="mt-4">
+            <app-rule-response
+              [rules]="searchResults.rules"
+              [error]="error"
+              (ruleDeleted)="deleteRule($event)"
+            >
+            </app-rule-response>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
