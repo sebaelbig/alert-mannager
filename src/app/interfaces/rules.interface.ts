@@ -1,8 +1,6 @@
-import { Rule } from './rule.interface';
-
-export interface Rules {
+export interface RulesResponse {
     count: number;
-    ruleList: Rule[];
+    ruleList: RuleDetails[];
     totalCount: number;
     totalPages: number;
 }
@@ -19,5 +17,11 @@ export interface RuleDetails {
     payerId: number;
     providerCode: string;
     isDisabled: boolean;
-  }
-  
+}
+
+
+export interface RuleRequest {
+    realm: string;
+    scopeId: number;
+    rule: string;
+}

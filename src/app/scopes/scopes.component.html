@@ -5,63 +5,139 @@
         <div class="card-header bg-primary text-white">
           <h4 class="mb-0">Scopes Configuration</h4>
         </div>
-        <div class="card-body">
+        <div class="card-body" [ngStyle]="{ 'background-color': getEnvironmentColor() }">
           <!-- Common Fields -->
           <app-common-fields
             [commonEnvironment]="commonEnvironment"
             [commonAuthToken]="commonAuthToken"
-            (commonEnvironmentChange)="
-              onCommonFieldsChange('environment', $event)
-            "
+            (commonEnvironmentChange)="onCommonFieldsChange('environment', $event)"
             (commonAuthTokenChange)="onCommonFieldsChange('token', $event)"
           ></app-common-fields>
 
-          <!-- Create Scope Form -->
-          <hr class="my-4" />
-          <h5 class="mb-3">Create Scope</h5>
-          <form (ngSubmit)="create()">
-            <div class="mb-3">
-              <label for="scopeName">Scope Name:</label>
-              <input
-                type="text"
-                id="scopeName"
-                name="scopeName"
-                [(ngModel)]="scopeName"
-                class="form-control"
-                placeholder="Enter scope name"
-              />
+          <!-- Tabs -->
+          <ul class="nav nav-tabs mt-4" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button 
+                class="nav-link" 
+                [class.active]="activeTab === 'search'"
+                (click)="activeTab = 'search'"
+                type="button" 
+                role="tab">
+                Search Rules
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button 
+                class="nav-link" 
+                [class.active]="activeTab === 'create'"
+                (click)="activeTab = 'create'"
+                type="button" 
+                role="tab">
+                Create Rule
+              </button>
+            </li>
+          </ul>
+
+          <!-- Tab Content -->
+          <div class="tab-content mt-3">
+            <!-- Search Rules Tab -->
+            <div class="tab-pane fade" [class.show]="activeTab === 'search'" [class.active]="activeTab === 'search'">
+              <h5 class="mb-3">Search Rules</h5>
+              <form>
+                <div class="mb-3">
+                  <label for="scopeSelect">Select Existing Scope:</label>
+                  <select
+                    id="scopeSelect"
+                    name="scopeSelect"
+                    [(ngModel)]="selectedScope"
+                    class="form-control"
+                  >
+                    <option value="">Select a scope...</option>
+                    <option *ngFor="let scope of scopes" [value]="scope.name">
+                      {{ scope.name }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="d-grid gap-2">
+                  <div class="row">
+                    <div class="col d-flex gap-2">
+                      <button
+                        class="btn btn-success"
+                        type="button"
+                        (click)="getActivation()"
+                        [disabled]="loading || !selectedScope"
+                      >
+                        <span *ngIf="!loading">Get activations</span>
+                        <span
+                          *ngIf="loading"
+                          class="spinner-border spinner-border-sm me-2"
+                        ></span>
+                        <span *ngIf="loading">Getting activations...</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="btn btn-danger"
+                        [disabled]="loading || !selectedScope"
+                        (click)="deleteScope()"
+                      >
+                        <span *ngIf="!loading">Delete Scope</span>
+                        <span
+                          *ngIf="loading"
+                          class="spinner-border spinner-border-sm me-2"
+                        ></span>
+                        <span *ngIf="loading">Deleting...</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="btn btn-warning"
+                        [disabled]="loading || !selectedScope"
+                        (click)="refreshCache()"
+                      >
+                        <span *ngIf="!loading">Refresh Cache</span>
+                        <span
+                          *ngIf="loading"
+                          class="spinner-border spinner-border-sm me-2"
+                        ></span>
+                        <span *ngIf="loading">Refreshing...</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
             </div>
 
-            <div class="mb-3">
-              <label for="scopeSelect">Or Select Existing Scope:</label>
-              <select
-                id="scopeSelect"
-                name="scopeSelect"
-                [(ngModel)]="selectedScope"
-                class="form-control"
-              >
-                <option value="">Select a scope...</option>
-                <option *ngFor="let scope of scopes" [value]="scope.name">
-                  {{ scope.name }}
-                </option>
-              </select>
-            </div>
+            <!-- Create Rule Tab -->
+            <div class="tab-pane fade" [class.show]="activeTab === 'create'" [class.active]="activeTab === 'create'">
+              <h5 class="mb-3">Create Rule</h5>
+              <form (ngSubmit)="create()">
+                <div class="mb-3">
+                  <label for="scopeName">Scope Name:</label>
+                  <input
+                    type="text"
+                    id="scopeName"
+                    name="scopeName"
+                    [(ngModel)]="scopeName"
+                    class="form-control"
+                    placeholder="Enter scope name"
+                  />
+                </div>
 
-            <div class="mb-3">
-              <label for="customerId">Customer ID:</label>
-              <input
-                type="text"
-                id="customerId"
-                name="customerId"
-                [(ngModel)]="customerId"
-                class="form-control"
-                placeholder="Enter customer ID"
-              />
-            </div>
+                <div class="mb-3">
+                  <label for="customerId">Customer ID:</label>
+                  <input
+                    type="text"
+                    id="customerId"
+                    name="customerId"
+                    [(ngModel)]="customerId"
+                    class="form-control"
+                    placeholder="Enter customer ID"
+                  />
+                </div>
 
-            <div class="d-grid gap-2">
-              <div class="row">
-                <div class="col d-flex gap-2">
+                <div class="d-grid">
                   <button
                     class="btn btn-primary"
                     type="submit"
@@ -74,37 +150,10 @@
                     ></span>
                     <span *ngIf="loading">Creating...</span>
                   </button>
-                  <button
-                    class="btn btn-success"
-                    type="button"
-                    (click)="getActivation()"
-                    [disabled]="loading || (!scopeName && !selectedScope)"
-                  >
-                    <span *ngIf="!loading">Get activations</span>
-                    <span
-                      *ngIf="loading"
-                      class="spinner-border spinner-border-sm me-2"
-                    ></span>
-                    <span *ngIf="loading">Getting activations...</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    class="btn btn-danger"
-                    [disabled]="loading || !scopeName"
-                    (click)="deleteScope()"
-                  >
-                    <span *ngIf="!loading">Delete Scope</span>
-                    <span
-                      *ngIf="loading"
-                      class="spinner-border spinner-border-sm me-2"
-                    ></span>
-                    <span *ngIf="loading">Deleting...</span>
-                  </button>
                 </div>
-              </div>
+              </form>
             </div>
-          </form>
+          </div>
 
           <!-- Response Section -->
           <div *ngIf="response" class="mt-4">

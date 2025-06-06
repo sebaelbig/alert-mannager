@@ -4,9 +4,11 @@ import {
   HttpParams,
   HttpErrorResponse,
   HttpClientModule,
+  HttpHeaders,
 } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatTabsModule } from '@angular/material/tabs';
 import { CommonFieldsComponent } from '../shared/common-fields/common-fields.component';
 import { ActivationResponseComponent } from '../shared/activation-response/activation-response.component';
 import { Scope } from '../interfaces/scope.interface';
@@ -15,10 +17,12 @@ import { ActivationResponse, ApiResponse } from '../interfaces/activation.interf
 @Component({
   selector: 'app-scopes',
   templateUrl: './scopes.component.html',
+  styleUrls: ['./scopes.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
+    MatTabsModule,
     CommonFieldsComponent,
     HttpClientModule,
     ActivationResponseComponent
@@ -35,6 +39,7 @@ export class ScopesComponent implements OnInit {
 
   scopes: Scope[] = [];
   selectedScope: string = '';
+  activeTab: string = 'search';
 
   constructor(private http: HttpClient) {}
 
@@ -189,6 +194,54 @@ export class ScopesComponent implements OnInit {
           this.error = true;
           this.loading = false;
           console.error('Error creating rule:', error);
+        }
+      });
+  }
+
+  getEnvironmentColor(): string {
+    switch (this.commonEnvironment) {
+      case 'DEV': return '#cdebf5';
+      case 'STAGE': return '#f5eccd';
+      case 'PROD': return '#f5d8cd';
+      default: return '#ffffff';
+    }
+  }
+
+  refreshCache() {
+    if (!this.selectedScope) {
+      console.error('No scope selected');
+      this.loading = false;
+      return;
+    }
+
+    this.loading = true;
+    const headers = new HttpHeaders().set('Authorization', this.commonAuthToken);
+    
+    // Extract the scope ID from the selected scope
+    const scopeId = this.scopes.find(scope => scope.name === this.selectedScope)?.id;
+    
+    if (!scopeId) {
+      console.error('Could not find scope ID for selected scope:', this.selectedScope);
+      this.loading = false;
+      return;
+    }
+
+    const payload = {
+      scopeIds: [scopeId]
+    };
+
+    this.http.post(`/api/cache/scope?realmid=${this.commonEnvironment}`, payload, { headers })
+      .subscribe({
+        next: (response: any) => {
+          console.log('Cache refreshed successfully:', response);
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error refreshing cache:', error);
+          this.loading = false;
+        },
+        complete: () => {
+          // No need to reset here as it's already handled in next/error
         }
       });
   }

@@ -1,0 +1,73 @@
+<form (ngSubmit)="submitRule.emit()">
+  <div class="mb-3">
+    <label for="scope" class="form-label">Scope</label>
+    <select
+      class="form-select"
+      id="scope"
+      name="scope"
+      [ngModel]="selectedScope"
+      (ngModelChange)="onScopeChange($event)"
+    >
+      <option [ngValue]="null">Select a scope</option>
+      <option *ngFor="let scope of scopes" [ngValue]="scope">
+        {{ scope.name }}
+      </option>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label for="rule" class="form-label">Rule</label>
+    <textarea
+      class="form-control"
+      id="rule"
+      [ngModel]="rule"
+      (ngModelChange)="onRuleChange($event)"
+      name="rule"
+      rows="10"
+      placeholder="Enter rule body"
+      required
+    ></textarea>
+  </div>
+
+  <div class="d-grid gap-2">
+    <div class="row g-2">
+      <div class="col">
+        <button
+          class="btn btn-primary w-100"
+          type="submit"
+          [disabled]="loading"
+        >
+          <span *ngIf="!loading">Create Rule</span>
+          <span
+            *ngIf="loading"
+            class="spinner-border spinner-border-sm me-2"
+          ></span>
+          <span *ngIf="loading">Creating...</span>
+        </button>
+      </div>
+      <div class="col">
+        <button
+          class="btn btn-secondary w-100"
+          type="button"
+          [disabled]="loading"
+          (click)="validateRule.emit()"
+        >
+          <span *ngIf="!loading">Validate Rule</span>
+          <span
+            *ngIf="loading"
+            class="spinner-border spinner-border-sm me-2"
+          ></span>
+          <span *ngIf="loading">Validating...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<div *ngIf="searchResults" class="mt-4">
+  <app-rule-response
+    [rules]="searchResults.ruleList"
+    [error]="error"
+  >
+  </app-rule-response>
+</div>

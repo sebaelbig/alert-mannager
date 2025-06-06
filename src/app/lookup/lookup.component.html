@@ -5,7 +5,7 @@
         <div class="card-header bg-primary text-white">
           <h4 class="mb-0">BHT03 Lookup Tool</h4>
         </div>
-        <div class="card-body">
+        <div class="card-body" [ngStyle]="{ 'background-color': getEnvironmentColor() }">
           <!-- Common Fields -->
           <app-common-fields
             [commonEnvironment]="commonEnvironment"

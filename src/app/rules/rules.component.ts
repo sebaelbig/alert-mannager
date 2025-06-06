@@ -8,30 +8,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CommonFieldsComponent } from '../shared/common-fields/common-fields.component';
 import { Scope } from '../interfaces/scope.interface';
-import { RuleDetails, Rules } from '../interfaces/rules.interface';
+import { RulesResponse, RuleDetails, RuleRequest } from '../interfaces/rules.interface';
 import { RuleResponseComponent } from '../shared/rule-response/rule-response.component';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
+import { RuleTabsComponent } from './rule-tabs/rule-tabs.component';
 
 interface Rule {
   name: string;
   ruleBody: string;
   salience: number;
-}
-
-interface CreateRuleDTO {
-  relm: string;
-  rule: {
-    name: string;
-    ruleBody: {
-      body: string;
-      realmId: number;
-    };
-    scope: {
-      name: string;
-      productId: number;
-    };
-  };
 }
 
 interface BulkRuleResponse {
@@ -49,52 +35,75 @@ interface BulkRuleResponse {
 @Component({
   selector: 'app-rules',
   templateUrl: './rules.component.html',
+  styleUrls: ['./rules.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
     CommonFieldsComponent,
     HttpClientModule,
-    RuleResponseComponent,
+    RuleTabsComponent,
   ],
 })
 export class RulesComponent implements OnInit {
   commonEnvironment: string = 'DEV';
   commonAuthToken: string = '';
-  ruleName: string = '';
-  ruleBody: string = '';
+  rule: string = '';
   loading: boolean = false;
   response: any = null;
   error: boolean = false;
   scopes: Scope[] = [];
-  selectedScope: string = '';
+  selectedScope: Scope | null = null;
   searchRuleName: string = '';
   searchAlertText: string = '';
-  searchResults: { rules: RuleDetails[] } = { rules: [] };
+  searchResults: RulesResponse | null = null;
+  activeTab: string = 'search';
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.loadScopes();
+    this.loadScopes().then(() => {
+      // After scopes are loaded, try to restore the selected scope
+      const savedScopeId = localStorage.getItem('selectedScopeId');
+      if (savedScopeId) {
+        const scope = this.scopes.find(
+          (s) => s.id === parseInt(savedScopeId, 10)
+        );
+        if (scope) {
+          this.selectedScope = scope;
+        }
+      }
+    });
   }
 
-  loadScopes(): void {
-    this.http
-      .get<{ scopes: Scope[] }>(`/api/scopes?realmId=${this.commonEnvironment}`)
-      .subscribe({
-        next: (response) => {
-          this.scopes = (response.scopes || []).sort((a, b) =>
-            (a.name || '').localeCompare(b.name || '')
-          );
-        },
-        error: (error) => {
-          console.error('Error loading scopes:', error);
-        },
-      });
+  loadScopes(): Promise<void> {
+    return new Promise((resolve) => {
+      this.http
+        .get<{ scopes: Scope[] }>(
+          `/api/scopes?realmId=${this.commonEnvironment}`
+        )
+        .subscribe({
+          next: (response) => {
+            this.scopes = (response.scopes || []).sort((a, b) =>
+              (a.name || '').localeCompare(b.name || '')
+            );
+            resolve();
+          },
+          error: (error) => {
+            console.error('Error loading scopes:', error);
+            resolve();
+          },
+        });
+    });
   }
 
   submitRule(): void {
-    if (!this.ruleName || !this.ruleBody || !this.commonEnvironment) {
+    if (
+      !this.rule ||
+      !this.commonEnvironment ||
+      !this.selectedScope ||
+      !this.selectedScope.id
+    ) {
       return;
     }
 
@@ -102,12 +111,10 @@ export class RulesComponent implements OnInit {
     this.response = null;
     this.error = false;
 
-    const requestData:Rule = {
-      relm: this.commonEnvironment,
-      rule: {
-        name: this.ruleName,
-        ruleBody: this.ruleBody,
-      },
+    const requestData: RuleRequest = {
+      realm: this.commonEnvironment,
+      scopeId: this.selectedScope.id,
+      rule: this.rule,
     };
 
     this.http.post<any>('/api/rules/create', requestData).subscribe({
@@ -139,8 +146,8 @@ export class RulesComponent implements OnInit {
     };
 
     // Only add optional parameters if they have values
-    if (this.selectedScope?.trim()) {
-      params.scope = this.selectedScope;
+    if (this.selectedScope?.name?.trim()) {
+      params.scope = this.selectedScope.name;
     }
     if (this.searchRuleName?.trim()) {
       params.ruleName = this.searchRuleName;
@@ -153,7 +160,7 @@ export class RulesComponent implements OnInit {
       .get<{ rules: RuleDetails[] }>('/api/rules', { params })
       .subscribe({
         next: (response) => {
-          this.searchResults = response || [];
+          this.searchResults = response.rules as unknown as RulesResponse;
           this.response = response;
           this.loading = false;
         },
@@ -192,6 +199,8 @@ export class RulesComponent implements OnInit {
       // Reset form state when environment changes
       this.response = null;
       this.error = false;
+      // Clear selected scope since we're changing environments
+      this.selectedScope = null;
       // Reload scopes for new environment
       this.loadScopes();
     } else if (field === 'token') {
@@ -207,42 +216,44 @@ export class RulesComponent implements OnInit {
     }
   }
 
-  deleteRule(ruleId: number): void {
-    if (!this.commonEnvironment ||!this.commonAuthToken) {
-      return;
-    }
+  // deleteRule(ruleId: number): void {
+  //   if (!this.commonEnvironment || !this.commonAuthToken) {
+  //     return;
+  //   }
 
-    this.loading = true;
-    this.response = null;
-    this.error = false;
-    
-    const headers = {
-      Authorization: this.commonAuthToken
-    };
+  //   this.loading = true;
+  //   this.response = null;
+  //   this.error = false;
 
-    this.http
-      .delete<any>(`/api/rules/${this.commonEnvironment}/${ruleId}`, { headers })
-      .subscribe({
-        next: (response) => {
-          this.searchResults.rules = this.searchResults.rules.filter(
-            (rule) => rule.alertRuleId !== ruleId
-          );
-          this.response = response;
-          this.loading = false;
-        },
-        error: (error) => {
-          this.error = true;
-          this.loading = false;
-          console.error('Error creating rule:', error);
-        },
-      });
-    // Optionally, call a backend service to delete the rule
-    // this.ruleService.deleteRule(ruleId).subscribe(() => {
-    //   console.log(`Rule ${ruleId} deleted successfully.`);
-    // });
-  }
+  //   const headers = {
+  //     Authorization: this.commonAuthToken,
+  //   };
 
-  submitBulkRules(rules: CreateRuleDTO[]): Observable<BulkRuleResponse> {
+  //   this.http
+  //     .delete<any>(`/api/rules/${this.commonEnvironment}/${ruleId}`, {
+  //       headers,
+  //     })
+  //     .subscribe({
+  //       next: (response) => {
+  //         this.searchResults.rules = this.searchResults.rules.filter(
+  //           (rule) => rule.alertRuleId !== ruleId
+  //         );
+  //         this.response = response;
+  //         this.loading = false;
+  //       },
+  //       error: (error) => {
+  //         this.error = true;
+  //         this.loading = false;
+  //         console.error('Error creating rule:', error);
+  //       },
+  //     });
+  //   // Optionally, call a backend service to delete the rule
+  //   // this.ruleService.deleteRule(ruleId).subscribe(() => {
+  //   //   console.log(`Rule ${ruleId} deleted successfully.`);
+  //   // });
+  // }
+
+  submitBulkRules(rules: RuleRequest[]): Observable<BulkRuleResponse> {
     if (!this.commonEnvironment || !this.commonAuthToken) {
       throw new Error('Environment and auth token are required');
     }
@@ -252,10 +263,11 @@ export class RulesComponent implements OnInit {
     this.error = false;
 
     const headers = {
-      'Authorization': this.commonAuthToken
+      Authorization: this.commonAuthToken,
     };
 
-    return this.http.post<BulkRuleResponse>('/api/rules/bulk', rules, { headers })
+    return this.http
+      .post<BulkRuleResponse>('/api/rules/bulk', rules, { headers })
       .pipe(
         finalize(() => {
           this.loading = false;
@@ -265,7 +277,10 @@ export class RulesComponent implements OnInit {
             this.response = response;
             if (response.hasErrors) {
               this.error = true;
-              console.warn('Some rules failed to create:', response.results.filter(r => r.error));
+              console.warn(
+                'Some rules failed to create:',
+                response.results.filter((r) => r.error)
+              );
             }
           },
           (error) => {
@@ -277,26 +292,19 @@ export class RulesComponent implements OnInit {
       );
   }
 
-  createMultipleRules(ruleConfigs: Array<{name: string, body: string, scope: string}>) {
-    if (!this.commonEnvironment) {
+  createMultipleRules(
+    ruleConfigs: Array<{ name: string; body: string; scope: string }>
+  ) {
+    if (!this.commonEnvironment || !this.selectedScope?.id) {
       this.error = true;
-      this.response = { error: 'Environment is required' };
+      this.response = { error: 'Environment and valid scope are required' };
       return;
     }
 
-    const rules = ruleConfigs.map(config => ({
-      relm: this.commonEnvironment,
-      rule: {
-        name: config.name,
-        ruleBody: {
-          body: config.body,
-          realmId: this.getRealmId(this.commonEnvironment)
-        },
-        scope: {
-          name: config.scope,
-          productId: 3 // Default product ID, adjust as needed
-        }
-      }
+    const rules = ruleConfigs.map((config) => ({
+      realm: this.commonEnvironment,
+      scopeId: this.selectedScope!.id!,
+      rule: config.body,
     }));
 
     this.submitBulkRules(rules).subscribe({
@@ -304,24 +312,88 @@ export class RulesComponent implements OnInit {
         if (response.hasErrors) {
           // Handle partial success
           const successCount = response.successCount;
-          const failedRules = response.results.filter(r => r.error);
-          console.log(`Created ${successCount} rules successfully. ${failedRules.length} rules failed.`);
+          const failedRules = response.results.filter((r) => r.error);
+          console.log(
+            `Created ${successCount} rules successfully. ${failedRules.length} rules failed.`
+          );
         } else {
           console.log('All rules created successfully');
         }
       },
       error: (error) => {
         console.error('Failed to create rules:', error);
-      }
+      },
     });
   }
 
   private getRealmId(environment: string): number {
     switch (environment.toUpperCase()) {
-      case 'PROD': return 1;
-      case 'STAGE': return 3;
-      case 'TEST': return 4;
-      case 'DEV': default: return 4;
+      case 'PROD':
+        return 1;
+      case 'STAGE':
+        return 3;
+      case 'TEST':
+        return 4;
+      case 'DEV':
+      default:
+        return 4;
     }
   }
+
+  getEnvironmentColor(): string {
+    switch (this.commonEnvironment) {
+      case 'DEV':
+        return '#cdebf5';
+      case 'STAGE':
+        return '#f5eccd';
+      case 'PROD':
+        return '#f5d8cd';
+      default:
+        return '#ffffff';
+    }
+  }
+
+  onScopeChange(scope: Scope) {
+    this.selectedScope = scope;
+    if (scope && scope.id) {
+      localStorage.setItem('selectedScopeId', scope.id.toString());
+    } else {
+      localStorage.removeItem('selectedScopeId');
+    }
+  }
+
+  validateRule(): void {
+    if (
+      !this.rule ||
+      !this.commonEnvironment ||
+      !this.selectedScope ||
+      !this.selectedScope.id
+    ) {
+      return;
+    }
+
+    this.loading = true;
+    this.response = null;
+    this.error = false;
+
+    const requestData: RuleRequest = {
+      realm: this.commonEnvironment,
+      scopeId: this.selectedScope.id,
+      rule: this.rule,
+    };
+
+    this.http.post<any>('/api/rules/validate', requestData).subscribe({
+      next: (response) => {
+        this.response = response;
+        this.loading = false;
+      },
+      error: (error) => {
+        this.error = true;
+        this.loading = false;
+        console.error('Error validating rule:', error);
+        this.response = { error: error.error || 'Failed to validate rule' };
+      },
+    });
+  }
+
 }

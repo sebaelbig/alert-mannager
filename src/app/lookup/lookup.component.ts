@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { HttpClient, HttpParams, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +15,7 @@ import { RequestDetailsComponent } from "./components/request-details/request-de
 @Component({
   selector: 'app-lookup',
   templateUrl: './lookup.component.html',
+  styleUrls: ['./lookup.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
@@ -27,7 +28,7 @@ import { RequestDetailsComponent } from "./components/request-details/request-de
     RequestDetailsComponent
 ],
 })
-export class LookupComponent {
+export class LookupComponent implements OnInit {
   bht03Code: string = '';
   private _prsUuid: string | null = null;
   sqlResults: DatamartDTO | null = null;
@@ -39,6 +40,10 @@ export class LookupComponent {
   commonAuthToken: string = '';
 
   constructor(private http: HttpClient) {}
+
+  ngOnInit(): void {
+    // Initialize any additional setup if needed
+  }
 
   onCommonFieldsChange(field: 'environment' | 'token', value: string) {
     if (field === 'environment') {
@@ -203,6 +208,15 @@ export class LookupComponent {
       return Date.now() >= exp * 1000;
     } catch (e) {
       return false;
+    }
+  }
+
+  getEnvironmentColor(): string {
+    switch (this.commonEnvironment) {
+      case 'DEV': return '#cdebf5';
+      case 'STAGE': return '#f5eccd';
+      case 'PROD': return '#f5d8cd';
+      default: return '#ffffff';
     }
   }
 }

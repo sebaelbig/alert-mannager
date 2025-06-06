@@ -11,6 +11,7 @@ C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\parts\codes\EntityRelationshipCode.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\utils\json\SecurityInfoQlfrDeserializer.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\utils\json\TraceTypeCodeDeserializer.java
+C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\controller\CacheController.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\dto\scope\ScopesResponse.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\ruleInput\RuleResponse.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\dto\Customer.java
@@ -48,6 +49,7 @@ C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\utils\json\DatePeriodFormatQlfrDeserializer.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\utils\json\MaintTypeCodeDeserializer.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\parts\codes\LocationQlfr.java
+C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\service\RuleUploadService.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\parts\codes\DatePeriodQlfr.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\RealmID.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\x12\Loop2000D.java
@@ -60,6 +62,7 @@ C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\parts\response\Substantiation.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\GenericAlertResponse.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\service\ScopeService.java
+C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\dto\RulePayload.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\parts\codes\CvgeLevelCode.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\parts\codes\IndRelCode.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\utils\json\TranSetPurpCodeDeserializer.java
@@ -79,6 +82,7 @@ C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\ruleInput\eligibility\parts\RuleEligibilityDate.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\parts\Provider.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\dto\AlertResponseDTO.java
+C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\dto\rule\InMemoryRuleDTO.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\ParseX12AlertRequest.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\parts\codes\InfStatusCode.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\parts\codes\LoopIdCode.java
@@ -127,6 +131,7 @@ C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\ruleInput\R
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\utils\json\IndRelCodeDeserializer.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\ScopesController.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\utils\json\InsurTypeCodeDeserializer.java
+C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\controller\RuleUploadController.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\utils\json\InterchangeCtrlVerNumDeserializer.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\x12\INS.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\x12\EB.java
@@ -136,6 +141,7 @@ C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\ruleInput\eligibility\parts\RuleTraceNumber.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\utils\json\LocationQlfrDeserializer.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\x12\N3.java
+C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\dto\Message.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\x12\GS.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\parts\codes\InterchangeCtrlVerNum.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\utils\json\AmtQualCodeDeserializer.java
@@ -193,9 +199,11 @@ C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\parts\response\BenefitRelatedEntity.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\ruleInput\eligibility\parts\RuleInsured.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\dto\DatamartDTO.java
+C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\dto\rule\MgmtRuleResponseDTO.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\utils\json\CodeCategoryDeserializer.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\dto\activation\Activation.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\x12\ISA.java
+C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\helper\RuleHelper.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\parts\codes\TranSetPurpCode.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\X12Response.java
 C:\dev\bht03-lookup-tool\src\main\java\com\recondo\lookup\generation\eligibility\parts\codes\DatePeriodFormatQlfr.java

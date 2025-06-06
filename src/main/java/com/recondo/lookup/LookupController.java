@@ -47,22 +47,27 @@ public class LookupController {
 
     try {
       String prsUuid = getPrsUuid(bht03Code);
-      if (prsUuid == null) {
+
+      if (prsUuid == null || prsUuid.trim().isEmpty() || !prsUuid.matches(UUID_REGEXP)) {
 
         if (realmID.equals(RealmID.STAGE)) {
           prsUuid = this.searchSherpaData("uiowae", "U of Iowa RTE Stage Node A", "4340", realmID, bht03Code);
-          if (prsUuid == null) {
+          if (prsUuid == null || prsUuid.trim().isEmpty() || !prsUuid.matches(UUID_REGEXP)) {
             prsUuid = this.searchSherpaData("ptrsna", "Peterson Regional Stage Node A", "4410", realmID, bht03Code);
           }
         } else if (realmID.equals(RealmID.PROD)) {
           //If it is not a PRS uuid for this, try using Sherpa
           prsUuid = this.searchSherpaData("uiowae", "U of Iowa RTE Prod Node B", "4401", realmID, bht03Code);
-          if (prsUuid == null) {
+          if (prsUuid == null || prsUuid.trim().isEmpty() || !prsUuid.matches(UUID_REGEXP)) {
             prsUuid = this.searchSherpaData("ptrsna", "Peterson Regional Prod Node A", "4410", realmID, bht03Code);
+            if (prsUuid == null || prsUuid.trim().isEmpty() || !prsUuid.matches(UUID_REGEXP)) {
+              prsUuid = this.searchSherpaData("shasce", "Shields Radiology Prod Node A", "4162", realmID, bht03Code);
+            }
+
           }
         }
 
-        if (prsUuid == null) {
+        if (prsUuid == null || prsUuid.trim().isEmpty() || !prsUuid.matches(UUID_REGEXP)) {
           return Response.status(Response.Status.NOT_FOUND)
             .entity(createErrorResponse("PRS UUID not found for the given BHT03 code"))
             .build();
@@ -146,6 +151,7 @@ public class LookupController {
       .url(url)
       .build();
 
+    System.out.println("getPrsUuid: Try to get bht03Code: " + bht03Code);
     try (okhttp3.Response response = client.newCall(request).execute()) {
       if (!response.isSuccessful())
         throw new IOException("Unexpected code " + response);

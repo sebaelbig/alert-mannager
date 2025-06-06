@@ -1,0 +1,106 @@
+<form (ngSubmit)="searchRules.emit()">
+  <div class="mb-3">
+    <label for="searchScope" class="form-label">Scope</label>
+    <select class="form-select" id="searchScope" name="searchScope" [ngModel]="selectedScope"
+      (ngModelChange)="onScopeChange($event)">
+      <option [ngValue]="null">All Scopes</option>
+      <option *ngFor="let scope of scopes" [ngValue]="scope">
+        {{ scope.name }}
+      </option>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label for="searchRuleName" class="form-label">Rule Name</label>
+    <input type="text" class="form-control" id="searchRuleName" [ngModel]="searchRuleName"
+      (ngModelChange)="onSearchRuleNameChange($event)" name="searchRuleName" placeholder="Search by rule name" />
+  </div>
+
+  <div class="mb-3">
+    <label for="searchAlertText" class="form-label">Alert Text</label>
+    <input type="text" class="form-control" id="searchAlertText" [ngModel]="searchAlertText"
+      (ngModelChange)="onSearchAlertTextChange($event)" name="searchAlertText" placeholder="Search by alert text" />
+  </div>
+
+  <div class="d-grid gap-2">
+    <button class="btn btn-primary" type="submit" [disabled]="loading">
+      <span *ngIf="!loading">Search Rules</span>
+      <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+      <span *ngIf="loading">Searching...</span>
+    </button>
+
+    <!-- New Button for Revenue Cycle Rules -->
+    <button class="btn btn-secondary" type="button" [disabled]="loading" (click)="searchCachedRulesLocal()">
+      <span *ngIf="!loading">Fetch cached rules</span>
+      <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+      <span *ngIf="loading">Fetching...</span>
+    </button>
+  </div>
+</form>
+
+<div *ngIf="searchResults" class="mt-4">
+  <div class="rule-response" *ngIf="searchResults.ruleList">
+
+    <!-- Rule Array Response -->
+    <div class="rule-data">
+      <div class="summary">
+        <div class="stat">
+          <label>Rules Found:</label>
+          <span>{{ searchResults.count }}</span>
+        </div>
+      </div>
+
+      <div class="rules">
+        <div *ngFor="let cachedRule of searchResults.ruleList" class="rule-item">
+          <h5>
+            {{ cachedRule.ruleName || "Unnamed Rule" }}(Id: {{ cachedRule.ruleId }})
+          </h5>
+          <div class="details">
+            <div class="detail-row" *ngIf="cachedRule.scopeId">
+              <label>Scope:</label>
+              <span>{{ cachedRule.scopeId }}</span>
+            </div>
+
+            <div class="detail-row" *ngIf="cachedRule.alertText">
+              <label>Alert Text:</label>
+              <span>{{ cachedRule.alertText }}</span>
+            </div>
+
+            <div class="detail-row " *ngIf="cachedRule.dbAlertText">
+              <label>DB Alert Text:</label>
+              <span>{{ cachedRule.dbAlertText }}</span>
+            </div>
+
+            <div class="detail-row status">
+              <label>Status:</label>
+              <span [class.disabled]="cachedRule.alertText !== cachedRule.dbAlertText">Alert Text is {{
+                cachedRule.alertText !== cachedRule.dbAlertText ? "different" : "same" }} in the database</span>
+            </div>
+
+          </div>
+
+          <!-- Replace line 55 with this: -->
+          <div class="rule-body" *ngIf="cachedRule.ruleBody">
+            <h4>Rule Body:</h4>
+            <pre>{{ trimRuleBody(cachedRule.ruleBody) }}</pre>
+          </div>
+
+          <!-- Delete Button -->
+          <button class="delete-button">
+            Refresh Cache
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="searchResults.count === 0" class="alert alert-info">
+    No rules found matching your search criteria.
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <div>
+      Total Rules: {{searchResults.totalCount}}
+    </div>
+  </div>
+</div>

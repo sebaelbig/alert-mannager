@@ -1,0 +1,66 @@
+<!-- Tabs -->
+<ul class="nav nav-tabs mt-4" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button 
+      class="nav-link" 
+      [class.active]="activeTab === 'search'"
+      (click)="activeTab = 'search'"
+      type="button" 
+      role="tab">
+      Search Rules
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button 
+      class="nav-link" 
+      [class.active]="activeTab === 'create'"
+      (click)="activeTab = 'create'"
+      type="button" 
+      role="tab">
+      Create Rule
+    </button>
+  </li>
+</ul>
+
+<!-- Tab Content -->
+<div class="tab-content mt-3">
+  <!-- Search Rules Tab -->
+  <div class="tab-pane fade" [class.show]="activeTab === 'search'" [class.active]="activeTab === 'search'">
+    <h5 class="mb-3">Search Rules</h5>
+    <app-rule-search-form
+      [loading]="loading"
+      [scopes]="scopes"
+      [selectedScope]="selectedScope"
+      [searchRuleName]="searchRuleName"
+      [searchAlertText]="searchAlertText"
+      [error]="error"
+      [commonEnvironment]="commonEnvironment"
+      [searchResults]="searchResults"
+      (scopeChange)="onScopeChange($event)"
+      (searchRules)="searchRules.emit()"
+      (searchRuleNameChange)="searchRuleNameChange.emit($event)"
+      (searchAlertTextChange)="searchAlertTextChange.emit($event)"
+      (loadingChange)="loadingChange.emit($event)"
+      (errorChange)="errorChange.emit($event)"
+      (searchResultsChange)="searchResultsChange.emit($event)"
+    ></app-rule-search-form>
+  </div>
+
+  <!-- Create Rule Tab -->
+  <div class="tab-pane fade" [class.show]="activeTab === 'create'" [class.active]="activeTab === 'create'">
+    <h5 class="mb-3">Create Rule</h5>
+    <app-rule-create-form
+      [loading]="loading"
+      [scopes]="scopes"
+      [selectedScope]="selectedScope"
+      [rule]="rule"
+      [error]="error"
+      [searchResults]="searchResults"
+      (scopeChange)="onScopeChange($event)"
+      (ruleChange)="onRuleChange($event)"
+      (submitRule)="submitRule.emit()"
+      (validateRule)="validateRule.emit()"
+      (ruleDeleted)="ruleDeleted.emit($event)"
+    ></app-rule-create-form>
+  </div>
+</div> 
